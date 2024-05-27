@@ -1,15 +1,23 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import { Tab, Tabs } from "@nextui-org/react";
 import type { editor } from "monaco-editor";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { VscCode } from "react-icons/vsc";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import Files from "./Files";
+import { I18nKey } from "#/i18n/declaration";
+import { RootState } from "#/store";
+import FileExplorer from "./file-explorer/FileExplorer";
 
 function CodeEditor(): JSX.Element {
-  const [selectedFileName, setSelectedFileName] = useState("welcome");
-  const [explorerOpen, setExplorerOpen] = useState(true);
+  const { t } = useTranslation();
   const code = useSelector((state: RootState) => state.code.code);
+  const activeFilepath = useSelector((state: RootState) => state.code.path);
+
+  const selectedFileName = useMemo(() => {
+    const paths = activeFilepath.split("/");
+    return paths[paths.length - 1];
+  }, [activeFilepath]);
 
   const handleEditorDidMount = (
     editor: editor.IStandaloneCodeEditor,
@@ -31,41 +39,40 @@ function CodeEditor(): JSX.Element {
 
   return (
     <div className="flex h-full w-full bg-neutral-900 transition-all duration-500 ease-in-out">
-      <Files
-        setSelectedFileName={setSelectedFileName}
-        setExplorerOpen={setExplorerOpen}
-        explorerOpen={explorerOpen}
-      />
+      <FileExplorer />
       <div className="flex flex-col min-h-0 w-full">
         <Tabs
           disableCursorAnimation
           classNames={{
-            base: "border-b border-divider",
+            base: "border-b border-divider border-neutral-600 mb-4",
             tabList:
               "w-full relative rounded-none bg-neutral-900 p-0 border-divider",
             cursor: "w-full bg-neutral-600 rounded-none",
             tab: "max-w-fit px-4 h-[36px]",
-            tabContent: "group-data-[selected=true]:text-white ",
+            tabContent: "group-data-[selected=true]:text-white",
           }}
           aria-label="Options"
         >
           <Tab
-            key={
-              selectedFileName === ""
-                ? "Welcome"
-                : selectedFileName.toLocaleLowerCase()
-            }
-            title={!selectedFileName ? "Welcome" : selectedFileName}
+            key={selectedFileName.toLocaleLowerCase()}
+            title={selectedFileName}
           />
         </Tabs>
-        <div className="flex grow">
-          <Editor
-            height="100%"
-            defaultLanguage="python"
-            defaultValue="# Welcome to OpenDevin!"
-            value={code}
-            onMount={handleEditorDidMount}
-          />
+        <div className="flex grow items-center justify-center">
+          {selectedFileName === "" ? (
+            <div className="flex flex-col items-center text-neutral-400">
+              <VscCode size={100} />
+              {t(I18nKey.CODE_EDITOR$EMPTY_MESSAGE)}
+            </div>
+          ) : (
+            <Editor
+              height="100%"
+              path={selectedFileName.toLocaleLowerCase()}
+              defaultValue=""
+              value={code}
+              onMount={handleEditorDidMount}
+            />
+          )}
         </div>
       </div>
     </div>

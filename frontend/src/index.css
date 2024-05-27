@@ -10,6 +10,7 @@
   --bg-editor-active: #31343D;
   --border-editor-sidebar: #3C3C4A;
   background-color: var(--neutral-900) !important;
+  --bg-neutral-muted: #afb8c133;
 }
 
 body {
@@ -26,21 +27,16 @@ code {
     monospace;
 }
 
-.editor-accordion h2 > button{
+.markdown-body code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  white-space: break-spaces;
+  background-color: var(--bg-neutral-muted);
+  border-radius: 6px;
+}
+
+.markdown-body pre code {
   padding: 0;
-}
-
-.editor-accordion-title {
-  color: var(--bg-neutral-400) !important;
-}
-
-.editor-accordion-content {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-.editor-accordion-content ul {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  background-color: inherit;
 }
